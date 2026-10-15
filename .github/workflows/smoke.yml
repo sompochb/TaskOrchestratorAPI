@@ -1,0 +1,31 @@
+name: Python smoke checks
+on:
+  push:
+  pull_request:
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m compileall -q app
+      - name: Start API and check endpoints
+        run: |
+          uvicorn app.main:app --host 127.0.0.1 --port 8000 &
+          python - <<'PY'
+          import json,time,urllib.request
+          for i in range(30):
+              try:
+                  for path in ("/health","/agents"):
+                      with urllib.request.urlopen("http://127.0.0.1:8000"+path,timeout=2) as response:
+                          assert response.status == 200
+                          json.load(response)
+                  print("API smoke checks passed")
+                  break
+              except Exception:
+                  if i==29: raise
+                  time.sleep(1)
+          PY
