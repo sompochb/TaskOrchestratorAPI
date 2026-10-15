@@ -2,9 +2,10 @@ name: Python smoke checks
 on:
   push:
   pull_request:
+  workflow_dispatch: 
 jobs:
   smoke:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Windows, x64]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
