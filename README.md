@@ -45,3 +45,18 @@ Create two independent tasks assigned to `lauren` and `john-wick`; each worker c
 - Uploaded files: `data/files/<task-id>/`
 
 Operational data is ignored by Git.
+
+
+## Codex CLI background workers
+
+Install and sign in to Codex CLI on the Windows PC that runs the API. Open separate PowerShell windows for each agent. The worker must run continuously to claim tasks; creating a task in Swagger alone does not launch Codex.
+
+```powershell
+# From this repository, with API already running:
+python codex_worker.py --agent lauren --workspace C:\\path\\to\\trusted\\project
+python codex_worker.py --agent john-wick --workspace C:\\path\\to\\trusted\\project
+```
+
+Workers poll `POST /worker/claim` every 5 seconds, execute `codex exec` in the chosen local workspace, and call `/complete` or `/fail`. The CLI must be installed, authenticated, and permitted to operate in that workspace. Set `ORCHESTRATOR_URL` to change the API address, or pass `--api`. Use `--timeout` to adjust the 30-minute per-task limit. The worker's process must remain running; use a Windows service or Task Scheduler for unattended operation.
+
+**Important:** Treat task descriptions as executable instructions. Run workers only against a trusted, authenticated API and trusted task authors; do not expose this unauthenticated API to the public internet. Codex may require approvals and its own sandbox policy. These workers do not automatically push Git commits, and a successful CLI exit alone does not prove task quality; review changes and test results. Status updates are stored in the API; automatic proactive notification to Nong Ing is not yet implemented.
