@@ -133,3 +133,7 @@ async def upload_file(task_id:str,file:UploadFile=File(...)):
 @app.get("/tasks/{task_id}/files")
 def task_files(task_id:str):
     with db() as c:return [dict(r) for r in c.execute("SELECT * FROM files WHERE task_id=? ORDER BY created_at",(task_id,))]
+
+# Local knowledge endpoints
+from app.knowledge import router as knowledge_router
+app.include_router(knowledge_router)
