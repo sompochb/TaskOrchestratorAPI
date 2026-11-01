@@ -20,6 +20,16 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 Open Swagger at `http://localhost:8000/docs`. Health: `http://localhost:8000/health`.
 
+## Two execution paths (agreed workflow)
+
+Task Orchestrator stays the local task/status coordinator. Do **not** make GitHub the orchestration center.
+
+1. **Local development**: Lauren works on the trusted Windows project workspace using Codex CLI. When interactive GUI work is required, use Computer Use with VS Code/Copilot **only if an actual GUI-capable executor is available**. The current `codex_worker.py` is CLI-only; it does not provide Computer Use.
+2. **GitHub changes**: ChatGPT uses its connected GitHub Connector to edit branches, commit, and open pull requests. The local Codex worker does **not** inherit ChatGPT's GitHub Connector credentials or access. This path must be performed by a ChatGPT session with the connector, not silently delegated to the local worker.
+3. **Validation**: John Wick tests the resulting changes and attaches actual test evidence to the task. Alicia reviews the pull request and records a review decision. Merge/deployment only after the required checks and review.
+
+Track these stages separately: `local_development`, `github_change`, `testing`, `review`, `merge_deploy`. Do not claim a stage complete without evidence (local diff/test output, commit/PR URL, test logs, review URL, or deployed health check). The current API has generic task statuses; these stage labels describe the workflow, **not** new API fields or implemented automation. A ChatGPT session must be active to execute connector operations; proactive execution is not implied.
+
 ## v0.2 background-agent model
 Tasks are persisted in SQLite. Independent pending tasks can be claimed by different workers in parallel. A task with dependencies stays pending until every prerequisite is completed. Workers report completion or failure; failures automatically return to pending until `max_retries` is exceeded.
 
