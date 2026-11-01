@@ -28,6 +28,8 @@ Task Orchestrator stays the local task/status coordinator. Do **not** make GitHu
 2. **GitHub changes**: ChatGPT uses its connected GitHub Connector to edit branches, commit, and open pull requests. The local Codex worker does **not** inherit ChatGPT's GitHub Connector credentials or access. This path must be performed by a ChatGPT session with the connector, not silently delegated to the local worker.
 3. **Validation**: John Wick tests the resulting changes and attaches actual test evidence to the task. Alicia reviews the pull request and records a review decision. Merge/deployment only after the required checks and review.
 
+Tasks now accept `execution_route`: `local_codex` (default, claimed by local Codex worker) or `chatgpt_github` (reserved for ChatGPT GitHub Connector execution). Local worker claims only `local_codex` tasks. **Important:** `chatgpt_github` tasks remain pending until an authorized ChatGPT session explicitly claims and executes them; no unattended ChatGPT Connector worker or automatic dispatch is implemented. The `/worker/claim` route parameter is for trusted executors only; this API is not authenticated and must not be publicly exposed.
+
 Track these stages separately: `local_development`, `github_change`, `testing`, `review`, `merge_deploy`. Do not claim a stage complete without evidence (local diff/test output, commit/PR URL, test logs, review URL, or deployed health check). The current API has generic task statuses; these stage labels describe the workflow, **not** new API fields or implemented automation. A ChatGPT session must be active to execute connector operations; proactive execution is not implied.
 
 ## v0.2 background-agent model
