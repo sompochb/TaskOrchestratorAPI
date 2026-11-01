@@ -7,6 +7,10 @@ Local-first background task orchestration backend for the agent team. SQLite and
 - John Wick — Software Tester
 - Khun Rabiap — Documentation
 - Nong Ing — Project Coordinator
+- Alicia — Technical Adviser / Architecture Review
+- Shogun — Thai Legal Specialist
+- Cyber One — Cybersecurity / Network Security
+- DB1 — Oracle / PL/SQL Database Specialist
 
 ## Run on Windows
 1. Install Python 3.11+.

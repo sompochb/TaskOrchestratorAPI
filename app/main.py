@@ -26,7 +26,7 @@ def init_db():
         cols={r["name"] for r in c.execute("PRAGMA table_info(tasks)")}
         for name,sql in {"result":"ALTER TABLE tasks ADD COLUMN result TEXT","error":"ALTER TABLE tasks ADD COLUMN error TEXT","retry_count":"ALTER TABLE tasks ADD COLUMN retry_count INTEGER NOT NULL DEFAULT 0","max_retries":"ALTER TABLE tasks ADD COLUMN max_retries INTEGER NOT NULL DEFAULT 2","cancel_requested":"ALTER TABLE tasks ADD COLUMN cancel_requested INTEGER NOT NULL DEFAULT 0"}.items():
             if name not in cols: c.execute(sql)
-        for name,role in [("Lauren","Technical Lead / Developer"),("John Wick","Software Tester"),("Khun Rabiap","Documentation"),("Nong Ing","Project Coordinator")]:
+        for name,role in [("Lauren","Technical Lead / Developer"),("John Wick","Software Tester"),("Khun Rabiap","Documentation"),("Nong Ing","Project Coordinator"),("Alicia","Technical Adviser / Architecture Review"),("Shogun","Thai Legal Specialist"),("Cyber One","Cybersecurity / Network Security"),("DB1","Oracle / PL/SQL Database Specialist")]:
             c.execute("INSERT OR IGNORE INTO agents(id,name,role) VALUES(?,?,?)",(name.lower().replace(" ","-"),name,role))
 init_db()
 
