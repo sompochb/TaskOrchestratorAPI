@@ -5,6 +5,7 @@ Run one process per agent with its own trusted workspace.
 """
 import argparse
 import json
+import re
 import logging
 import os
 from pathlib import Path
@@ -27,6 +28,11 @@ def api(base, method, path, params=None, timeout=30):
         return json.load(response)
 
 
+BLOCKED_PATTERNS = ("helper_unknown_error", "setup refresh had errors", "read-only", "read.only", "blocked by the environment", "blocked before repository inspection", "no files changed; no tests ran")
+
+def is_blocked_report(output):
+    return any(re.search(p, output, re.IGNORECASE) for p in BLOCKED_PATTERNS)
+
 def run_task(task, workspace, agent, codex, timeout, base):
     task_id = task["id"]
     prompt = (
@@ -44,7 +50,7 @@ def run_task(task, workspace, agent, codex, timeout, base):
         result = subprocess.run(command, cwd=workspace, capture_output=True, text=True,
                                 timeout=timeout, check=False)
         summary = (result.stdout or "")[-12000:]
-        if result.returncode:
+        if result.returncode or is_blocked_report((result.stderr or '') + '\n' + summary):
             error = ((result.stderr or "") + "\n" + summary)[-4000:]
             api(base, "POST", f"/tasks/{task_id}/fail", {"error": error or f"Codex exited {result.returncode}"})
             LOG.error("Task %s failed (exit %s)", task_id, result.returncode)
